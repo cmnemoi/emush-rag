@@ -1,3 +1,5 @@
+name: emush-rag
+
 services:
   app:
     image: ghcr.io/cmnemoi/emush-rag/api:${IMAGE_TAG:-latest}
