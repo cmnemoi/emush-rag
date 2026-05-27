@@ -4,10 +4,12 @@ services:
     container_name: emush-rag-api
     labels:
       - traefik.enable=true
-      - traefik.http.routers.app.rule=Host(`api.askneron.cmnemoi.com`)
-      - traefik.http.routers.app.entrypoints=websecure
-      - traefik.http.routers.app.tls.certresolver=letsencrypt
-      - traefik.http.services.app.loadbalancer.server.port=8080
+      - traefik.docker.network=traefik-proxy
+      - traefik.http.routers.emush-rag-api.rule=Host(`api.askneron.cmnemoi.com`)
+      - traefik.http.routers.emush-rag-api.entrypoints=websecure
+      - traefik.http.routers.emush-rag-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.emush-rag-api.service=emush-rag-api
+      - traefik.http.services.emush-rag-api.loadbalancer.server.port=8080
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - VECTOR_STORE_URL=${VECTOR_STORE_URL}
@@ -43,10 +45,12 @@ services:
     container_name: emush-rag-grafana
     labels:
       - traefik.enable=true
-      - traefik.http.routers.grafana.rule=Host(`grafana.askneron.cmnemoi.com`)
-      - traefik.http.routers.grafana.entrypoints=websecure
-      - traefik.http.routers.grafana.tls.certresolver=letsencrypt
-      - traefik.http.services.grafana.loadbalancer.server.port=3000
+      - traefik.docker.network=traefik-proxy
+      - traefik.http.routers.emush-rag-grafana.rule=Host(`grafana.askneron.cmnemoi.com`)
+      - traefik.http.routers.emush-rag-grafana.entrypoints=websecure
+      - traefik.http.routers.emush-rag-grafana.tls.certresolver=letsencrypt
+      - traefik.http.routers.emush-rag-grafana.service=emush-rag-grafana
+      - traefik.http.services.emush-rag-grafana.loadbalancer.server.port=3000
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
