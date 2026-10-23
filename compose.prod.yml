@@ -4,6 +4,7 @@ services:
   app:
     image: ghcr.io/cmnemoi/emush-rag/api:${IMAGE_TAG:-latest}
     container_name: emush-rag-api
+    ports: ["127.0.0.1:8160:8080"]
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-proxy
@@ -45,6 +46,7 @@ services:
   grafana:
     image: ghcr.io/cmnemoi/emush-rag/grafana:${IMAGE_TAG:-latest}
     container_name: emush-rag-grafana
+    ports: ["127.0.0.1:8161:3000"]
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-proxy
