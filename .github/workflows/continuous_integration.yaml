@@ -20,16 +20,16 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         name: Checkout
       - name: Install uv
-        uses: astral-sh/setup-uv@a7e15805d229f8677c5ddf08590a8cb972658599
+        uses: astral-sh/setup-uv@18d369b23da25a81e9458561248e1aafff6a70fa
         with:
           cache-dependency-glob: "uv.lock"
           enable-cache: true
           version: "0.5.1"
       - name: Set up Python
-        uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
         with:
           python-version-file: ".python-version"
       - name: Install dependencies
@@ -48,16 +48,16 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         name: Checkout
       - name: Install uv
-        uses: astral-sh/setup-uv@a7e15805d229f8677c5ddf08590a8cb972658599
+        uses: astral-sh/setup-uv@18d369b23da25a81e9458561248e1aafff6a70fa
         with:
           cache-dependency-glob: "uv.lock"
           enable-cache: true
           version: "0.5.1"
       - name: Set up Python
-        uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
         with:
           python-version-file: ".python-version"
       - name: Install dependencies
@@ -65,6 +65,6 @@ jobs:
       - name: Run tests with pytest
         run: make test
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
