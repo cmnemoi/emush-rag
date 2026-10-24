@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   vector_store:
-    image: chromadb/chroma:1.3.5
+    image: chromadb/chroma:1.5.9
     volumes:
       - ./chroma:/data
     restart: unless-stopped
@@ -27,7 +27,7 @@ services:
       - emush_rag
 
   jaeger:
-    image: jaegertracing/all-in-one:1.71.0
+    image: jaegertracing/all-in-one:1.76.0
     environment:
       - COLLECTOR_ZIPKIN_HOST_PORT=:9411
     networks:

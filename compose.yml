@@ -1,6 +1,6 @@
 services:
   reverse-proxy:
-    image: traefik:v3.6.6
+    image: traefik:v3.7.15
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -41,7 +41,7 @@ services:
       - host.docker.internal:host-gateway
 
   vector_store:
-    image: chromadb/chroma:1.3.5
+    image: chromadb/chroma:1.5.9
     ports:
     - mode: ingress
       target: 8000
@@ -53,7 +53,7 @@ services:
       - emush_rag
 
   jaeger:
-    image: jaegertracing/all-in-one:1.71.0
+    image: jaegertracing/all-in-one:1.76.0
     ports:
       - 4317:4317
       - 4318:4318
