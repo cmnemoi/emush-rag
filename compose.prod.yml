@@ -5,14 +5,6 @@ services:
     image: ghcr.io/cmnemoi/emush-rag/api:${IMAGE_TAG:-latest}
     container_name: emush-rag-api
     ports: ["127.0.0.1:8160:8080"]
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik-proxy
-      - traefik.http.routers.emush-rag-api.rule=Host(`api.askneron.cmnemoi.com`)
-      - traefik.http.routers.emush-rag-api.entrypoints=websecure
-      - traefik.http.routers.emush-rag-api.tls.certresolver=letsencrypt
-      - traefik.http.routers.emush-rag-api.service=emush-rag-api
-      - traefik.http.services.emush-rag-api.loadbalancer.server.port=8080
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - VECTOR_STORE_URL=${VECTOR_STORE_URL}
@@ -22,7 +14,6 @@ services:
       - jaeger
     networks:
       - emush_rag
-      - traefik-proxy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
@@ -47,14 +38,6 @@ services:
     image: ghcr.io/cmnemoi/emush-rag/grafana:${IMAGE_TAG:-latest}
     container_name: emush-rag-grafana
     ports: ["127.0.0.1:8161:3000"]
-    labels:
-      - traefik.enable=true
-      - traefik.docker.network=traefik-proxy
-      - traefik.http.routers.emush-rag-grafana.rule=Host(`grafana.askneron.cmnemoi.com`)
-      - traefik.http.routers.emush-rag-grafana.entrypoints=websecure
-      - traefik.http.routers.emush-rag-grafana.tls.certresolver=letsencrypt
-      - traefik.http.routers.emush-rag-grafana.service=emush-rag-grafana
-      - traefik.http.services.emush-rag-grafana.loadbalancer.server.port=3000
     volumes:
       - grafana-data:/var/lib/grafana
     environment:
@@ -63,14 +46,10 @@ services:
       - jaeger
     networks:
       - emush_rag
-      - traefik-proxy
     restart: unless-stopped
 
 networks:
   emush_rag:
     driver: bridge
-  traefik-proxy:
-    external: true
-
 volumes:
   grafana-data:
