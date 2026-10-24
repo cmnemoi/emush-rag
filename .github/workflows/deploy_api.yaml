@@ -5,6 +5,9 @@ on:
     branches:
       - main
   workflow_dispatch:
+  # Rebuild every week to pick up security fixes of the base images.
+  schedule:
+    - cron: "0 5 * * 1"
 
 env:
   REGISTRY: ghcr.io
@@ -42,6 +45,7 @@ jobs:
       - name: Build and push app image
         uses: docker/build-push-action@v6
         with:
+          pull: true
           context: .
           file: Dockerfile.app
           push: true
@@ -54,6 +58,7 @@ jobs:
       - name: Build and push grafana image
         uses: docker/build-push-action@v6
         with:
+          pull: true
           context: .
           file: Dockerfile.grafana
           push: true
