@@ -20,7 +20,7 @@ index-documents:
 	uv run emush_rag/cli/index_documents.py
 	scp -P 49512 -r ./chroma askneron@cmnemoi.com:~/www/new_chroma
 	ssh askneron@cmnemoi.com -p 49512 "rm -rf ~/www/chroma && mv ~/www/new_chroma ~/www/chroma && rm -rf ~/www/new_chroma"
-	ssh askneron@cmnemoi.com -p 49512 "docker compose -f compose.prod.yml down && docker compose -f compose.prod.yml up -d --remove-orphans"
+	ssh askneron@cmnemoi.com -p 49512 "docker compose -f compose.prod.yml -f ~/compose.vps.yaml down && docker compose -f compose.prod.yml -f ~/compose.vps.yaml up -d --remove-orphans"
 
 install:
 	uv lock
