@@ -21,8 +21,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Step 2: Run the application
 FROM python:3.13-slim
 
+# The application runs unprivileged and cannot modify its own code, owned by root.
+RUN useradd --system --uid 10001 --create-home app
+
 # Copy the environment, but not the source code
-COPY --from=builder --chown=app:app /app/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
+
+USER app
 
 EXPOSE 8080
 

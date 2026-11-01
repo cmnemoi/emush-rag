@@ -20,6 +20,8 @@ services:
 
   vector_store:
     image: chromadb/chroma:1.5.9
+    # The image runs as root by default: ./chroma must belong to this user.
+    user: "10001:10001"
     volumes:
       - ./chroma:/data
     restart: unless-stopped
