@@ -412,7 +412,7 @@ wheels = [
 
 [[package]]
 name = "emush-rag"
-version = "1.10.0"
+version = "1.11.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
@@ -437,6 +437,7 @@ lint = [
     { name = "mypy" },
     { name = "pytest-mypy" },
     { name = "ruff" },
+    { name = "testcontainers", extra = ["opensearch"] },
     { name = "types-tqdm" },
 ]
 test = [
@@ -468,6 +469,7 @@ lint = [
     { name = "mypy", specifier = ">=1.19.1" },
     { name = "pytest-mypy", specifier = ">=1.0.1" },
     { name = "ruff", specifier = ">=0.15.4" },
+    { name = "testcontainers", extras = ["opensearch"], specifier = ">=4.15.0" },
     { name = "types-tqdm", specifier = ">=4.67.3.20260205" },
 ]
 test = [
