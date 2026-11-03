@@ -50,7 +50,9 @@ To improve the answer of the RAG model, you can index new documents in the vecto
 make index-local-documents
 ```
 
-`make index-documents` scrapes the wikis again and indexes them in production through an SSH tunnel. Documents go to a new index, which is served once complete: the previous index is kept for rollback.
+Production is reindexed from freshly scraped wikis every Monday by the [Index documents](.github/workflows/index_documents.yaml) workflow, which can also be run manually from GitHub. To reindex it from your machine, run `make index-documents`: it needs a `cmnemoi.production` host in your SSH config.
+
+Both reach the production OpenSearch through an SSH tunnel. Documents go to a new index, which is served once complete: the previous index is kept for rollback.
 
 ## Development
 

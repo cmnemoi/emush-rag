@@ -1,18 +1,23 @@
 #!/bin/sh
 # Index data/ into the production OpenSearch through an SSH tunnel.
 # The API keeps serving the previous index until the new one is complete.
+#
+# Usage: scripts/index-production-documents [ssh options...] <destination>
+#   From a workstation: scripts/index-production-documents cmnemoi.production
+#   From the CI:        scripts/index-production-documents -p 49512 -i key askneron@host
 set -eu
 
-SERVER="askneron@cmnemoi.com"
-SSH_PORT=49512
+if [ "$#" -eq 0 ]; then
+    echo "Usage: $0 [ssh options...] <destination>" >&2
+    exit 1
+fi
+
+# The server publishes OpenSearch on its loopback only, on the port assigned to askneron by my-vps.
+SERVER_PORT=8162
 LOCAL_PORT=19200
 CONTROL_SOCKET="$(mktemp -u)"
 
-# OpenSearch is published on a port chosen by the server, on its loopback only.
-remote_port=$(ssh -p "$SSH_PORT" "$SERVER" "docker port emush-rag-vector-store 9200/tcp | head -1 | cut -d: -f2")
-
-ssh -p "$SSH_PORT" -M -S "$CONTROL_SOCKET" -fN -o ExitOnForwardFailure=yes \
-    -L "$LOCAL_PORT:127.0.0.1:$remote_port" "$SERVER"
-trap 'ssh -p "$SSH_PORT" -S "$CONTROL_SOCKET" -O exit "$SERVER" 2>/dev/null' EXIT
+ssh -M -S "$CONTROL_SOCKET" -fN -o ExitOnForwardFailure=yes -L "$LOCAL_PORT:127.0.0.1:$SERVER_PORT" "$@"
+trap 'ssh -S "$CONTROL_SOCKET" -O exit "$@" 2>/dev/null' EXIT
 
 uv run emush_rag/cli/index_documents.py --vector-store-url localhost --vector-store-port "$LOCAL_PORT"

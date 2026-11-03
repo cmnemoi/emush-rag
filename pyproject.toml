@@ -38,7 +38,10 @@ index-documents = "emush_rag.cli.index_documents:app"
 dev = [
     "pytest-watcher>=0.6.3",
     "python-semantic-release>=10.5.3",
-    "typer>=0.23,<0.24",
+    "typer>=0.27,<0.28",
+]
+indexation = [
+    "mush-wikis-scraper>=5.0.0",
 ]
 lint = [
     "mypy>=1.19.1",

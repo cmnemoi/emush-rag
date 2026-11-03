@@ -1,0 +1,51 @@
+name: Index documents
+
+on:
+  workflow_dispatch:
+  # Pick up the week's wiki changes, after the weekly rebuild of the images.
+  schedule:
+    - cron: "0 6 * * 1"
+
+# A deployment recreates the OpenSearch container: do not index meanwhile.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  index-documents:
+    name: Index documents in production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Install uv
+        uses: astral-sh/setup-uv@18d369b23da25a81e9458561248e1aafff6a70fa
+        with:
+          cache-dependency-glob: "uv.lock"
+          enable-cache: true
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version-file: ".python-version"
+      - name: Install dependencies
+        run: uv sync --locked --group indexation
+      - name: Scrape the wikis
+        run: uv run mush-wikis-scrap > data/wikis.json
+      - name: Set up SSH
+        env:
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          SERVER_SSH_KNOWN_HOSTS: ${{ vars.SERVER_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SERVER_SSH_KEY" > ~/.ssh/server
+          chmod 600 ~/.ssh/server
+          printf '%s\n' "$SERVER_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Index documents
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY_PROD }}
+        run: >-
+          ./scripts/index-production-documents
+          -p ${{ vars.SERVER_SSH_PORT }} -i ~/.ssh/server -o IdentitiesOnly=yes
+          ${{ vars.SERVER_USERNAME }}@${{ vars.SERVER_HOST }}

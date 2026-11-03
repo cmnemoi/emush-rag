@@ -15,8 +15,8 @@ check-types:
 	uv run mypy .
 
 index-documents:
-	mush-wikis-scrap > data/wikis.json
-	./scripts/index-production-documents
+	uv run --group indexation mush-wikis-scrap > data/wikis.json
+	./scripts/index-production-documents cmnemoi.production
 
 index-local-documents:
 	uv run emush_rag/cli/index_documents.py --vector-store-url localhost --vector-store-port $$(docker compose port vector_store 9200 | cut -d: -f2)
