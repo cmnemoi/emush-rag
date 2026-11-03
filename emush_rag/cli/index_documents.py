@@ -1,5 +1,4 @@
 import typer
-from opensearchpy import OpenSearch
 
 from emush_rag.adapters.file_system_json_document_reader import FileSystemJsonDocumentReader
 from emush_rag.adapters.langchain_recursive_character_document_splitter import (
@@ -30,7 +29,8 @@ def create_app(embedder: Embedder) -> typer.Typer:
     ) -> None:
         """Index JSON documents from data directory into OpenSearch"""
         vector_store = OpenSearchVectorStore(
-            client=OpenSearch(hosts=[{"host": vector_store_url, "port": vector_store_port}]),
+            host=vector_store_url,
+            port=vector_store_port,
             alias=index_alias,
             embedder=embedder,
         )

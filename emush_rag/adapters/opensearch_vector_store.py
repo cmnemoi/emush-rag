@@ -21,12 +21,13 @@ class OpenSearchVectorStore(VectorStore):
 
     def __init__(
         self,
-        client: OpenSearch,
+        host: str,
+        port: int,
         alias: str,
         embedder: Embedder,
         keyword_weight: float = config.hybrid_search_keyword_weight,
     ):
-        self.client = client
+        self.client = OpenSearch(hosts=[{"host": host, "port": port}])
         self.alias = alias
         self.embedder = embedder
         self.keyword_weight = keyword_weight

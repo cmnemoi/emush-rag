@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from opensearchpy import OpenSearch
-
 from emush_rag.adapters.in_memory_rate_limiter import InMemoryRateLimiter
 from emush_rag.adapters.openai_embedder import OpenAIEmbedder
 from emush_rag.adapters.openai_llm_client import OpenAILLMClient
@@ -33,7 +31,8 @@ def _llm_client() -> OpenAILLMClient:
 
 def _vector_store() -> OpenSearchVectorStore:
     return OpenSearchVectorStore(
-        client=OpenSearch(hosts=[{"host": config.vector_store_url, "port": config.vector_store_port}]),
+        host=config.vector_store_url,
+        port=config.vector_store_port,
         alias=config.index_alias,
         embedder=embedder(),
     )

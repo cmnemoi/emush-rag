@@ -4,21 +4,19 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from click.testing import Result
 from opensearchpy import OpenSearch
-from testcontainers.community.opensearch import OpenSearchContainer
-from typer.testing import CliRunner
+from typer.testing import CliRunner, Result
 
 from emush_rag.adapters.opensearch_vector_store import OpenSearchVectorStore
 from emush_rag.cli.index_documents import create_app
+from tests.conftest import OpenSearchAddress
 from tests.test_doubles import FakeEmbedder
 
 
 class TestIndexDocumentsCLI:
     @pytest.fixture(autouse=True)
-    def setup(self, opensearch_container: OpenSearchContainer, opensearch_client: OpenSearch) -> None:
-        self.opensearch_container = opensearch_container
-        self.opensearch_client = opensearch_client
+    def setup(self, opensearch_address: OpenSearchAddress, opensearch_client: OpenSearch) -> None:
+        self.opensearch_address = opensearch_address
         self.sample_documents = self._create_sample_documents()
         self.temp_dir = self._create_temp_dir()
         self.data_dir = self._create_data_dir()
@@ -91,14 +89,13 @@ class TestIndexDocumentsCLI:
         return CliRunner()
 
     def _run_index_documents_command(self, runner: CliRunner, index_alias: str) -> Result:
-        opensearch = self.opensearch_container.get_config()
         args = [
             "--data-dir",
             str(self.data_dir),
             "--vector-store-url",
-            opensearch["host"],
+            self.opensearch_address.host,
             "--vector-store-port",
-            str(opensearch["port"]),
+            str(self.opensearch_address.port),
             "--index-alias",
             index_alias,
         ]
@@ -109,7 +106,12 @@ class TestIndexDocumentsCLI:
         assert f"{nb_documents} documents indexed successfully" in result.stdout
 
     def _get_indexed_documents(self, index_alias: str) -> list:
-        vector_store = OpenSearchVectorStore(client=self.opensearch_client, alias=index_alias, embedder=FakeEmbedder())
+        vector_store = OpenSearchVectorStore(
+            host=self.opensearch_address.host,
+            port=self.opensearch_address.port,
+            alias=index_alias,
+            embedder=FakeEmbedder(),
+        )
         return vector_store.get_all_documents()
 
     def _assert_documents_were_indexed_correctly(self, indexed_documents: list) -> None:

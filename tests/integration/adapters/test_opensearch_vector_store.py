@@ -3,14 +3,17 @@ from opensearchpy import OpenSearch
 
 from emush_rag.adapters.opensearch_vector_store import OpenSearchVectorStore
 from emush_rag.models.document import Document, DocumentMetadata
+from tests.conftest import OpenSearchAddress
 from tests.test_doubles import FakeEmbedder
 
 
 class TestOpenSearchVectorStore:
     @pytest.fixture(autouse=True)
-    def setup(self, opensearch_client: OpenSearch) -> None:
+    def setup(self, opensearch_address: OpenSearchAddress, opensearch_client: OpenSearch) -> None:
         self.client = opensearch_client
-        self.store = OpenSearchVectorStore(client=self.client, alias="my_alias", embedder=FakeEmbedder())
+        self.store = OpenSearchVectorStore(
+            host=opensearch_address.host, port=opensearch_address.port, alias="my_alias", embedder=FakeEmbedder()
+        )
         self._given_a_published_empty_version()
 
     def test_indexed_documents_keep_their_content_and_metadata(self) -> None:
