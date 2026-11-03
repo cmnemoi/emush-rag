@@ -67,3 +67,4 @@ dmypy.json
 
 # Documentation
 docs/_build/
+secrets.env
