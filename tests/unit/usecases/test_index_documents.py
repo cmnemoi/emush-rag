@@ -1,6 +1,8 @@
 import random
 import string
 
+import pytest
+
 from emush_rag.adapters.langchain_recursive_character_document_splitter import (
     LangchainRecursiveCharacterDocumentSplitter,
 )
@@ -88,6 +90,26 @@ class TestIndexDocuments:
             assert chunk.metadata["title"] == "Test Title"
             assert chunk.metadata["link"] == "https://example.com"
             assert chunk.metadata["source"] == "test_source"
+
+    def test_reindexing_serves_only_the_new_documents(self):
+        self._create_documents_with_content(2, content="old content")
+        self.index_documents.execute()
+        new_documents = self._create_documents_with_content(1, content="new content")
+
+        self.index_documents.execute()
+
+        self._assert_documents_indexed(new_documents)
+
+    def test_failed_reindexing_keeps_serving_the_current_documents(self):
+        current_documents = self._create_documents_with_content(2, content="current content")
+        self.index_documents.execute()
+        self.vector_store.fails_on_batch = self.vector_store.nb_calls + 1
+        self._create_documents_with_content(1, content="new content")
+
+        with pytest.raises(ConnectionError):
+            self.index_documents.execute()
+
+        self._assert_documents_indexed(current_documents)
 
     def _create_documents_with_content(self, count: int, content: str = "default content") -> list[Document]:
         documents = [

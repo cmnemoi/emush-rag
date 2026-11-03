@@ -97,10 +97,8 @@ jobs:
           IMAGE_TAG: ${{ needs.build-and-push.outputs.image-tag }}
           GF_SECURITY_ADMIN_PASSWORD: ${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY_PROD }}
-          VECTOR_STORE_URL: ${{ vars.VECTOR_STORE_URL }}
-          VECTOR_STORE_PORT: ${{ vars.VECTOR_STORE_PORT }}
         with:
-          envs: IMAGE_TAG,GF_SECURITY_ADMIN_PASSWORD,OPENROUTER_API_KEY,VECTOR_STORE_URL,VECTOR_STORE_PORT
+          envs: IMAGE_TAG,GF_SECURITY_ADMIN_PASSWORD,OPENROUTER_API_KEY
           host: ${{ vars.SERVER_HOST }}
           username: ${{ vars.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}

@@ -16,11 +16,10 @@ check-types:
 
 index-documents:
 	mush-wikis-scrap > data/wikis.json
-	rm -rf chroma
-	uv run emush_rag/cli/index_documents.py
-	scp -P 49512 -r ./chroma askneron@cmnemoi.com:~/www/new_chroma
-	ssh askneron@cmnemoi.com -p 49512 "rm -rf ~/www/chroma && mv ~/www/new_chroma ~/www/chroma && rm -rf ~/www/new_chroma"
-	ssh askneron@cmnemoi.com -p 49512 "docker compose -f compose.prod.yml -f ~/compose.vps.yaml down && docker compose -f compose.prod.yml -f ~/compose.vps.yaml up -d --remove-orphans"
+	./scripts/index-production-documents
+
+index-local-documents:
+	uv run emush_rag/cli/index_documents.py --vector-store-url localhost --vector-store-port $$(docker compose port vector_store 9200 | cut -d: -f2)
 
 edit-secrets:
 	mise exec -- sops edit secrets.env
@@ -66,4 +65,4 @@ upgrade-dependencies:
 watch:
 	docker compose up --watch
 
-.PHONY: all build-watch check check-format check-lint check-types edit-secrets install lint semantic-release setup-env-variables setup-git-hooks test upgrade-dependencies
+.PHONY: all build-watch check check-format check-lint check-types edit-secrets index-documents index-local-documents install lint semantic-release setup-env-variables setup-git-hooks test upgrade-dependencies

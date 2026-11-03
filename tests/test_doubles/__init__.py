@@ -1,3 +1,3 @@
-from .test_doubles import FakeVectorStore, InMemoryJsonDocumentReader, fake_answer_user_question
+from .test_doubles import FakeEmbedder, FakeVectorStore, InMemoryJsonDocumentReader, fake_answer_user_question
 
-__all__ = ["FakeVectorStore", "InMemoryJsonDocumentReader", "fake_answer_user_question"]
+__all__ = ["FakeEmbedder", "FakeVectorStore", "InMemoryJsonDocumentReader", "fake_answer_user_question"]

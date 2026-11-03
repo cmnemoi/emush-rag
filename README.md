@@ -8,7 +8,7 @@ A RAG-based API to answer questions about [eMush](https://emush.eternaltwin.org/
 
 Stack: 
 - [FastAPI](https://fastapi.tiangolo.com/) for the API, [pytest](https://docs.pytest.org/en/stable/) for automated testing ;
-- [Chroma](https://www.trychroma.com/) for the vector database allowing document retrieval ;
+- [OpenSearch](https://opensearch.org/) for the hybrid search (keywords and embeddings) allowing document retrieval ;
 - [Github Actions](https://github.com/features/actions) and [Docker Swarm](https://docs.docker.com/engine/swarm/) for automated deployment via a CI/CD pipeline on a self-managed [Digital Ocean server](https://www.digitalocean.com/products/droplets/) : https://askneron.com/docs
 - [OpenTelemetry](https://opentelemetry.io/) for tracing and metrics (exported with [Jaeger](https://www.jaegertracing.io/)) ;
 - [Grafana](https://grafana.com/) for monitoring dashboards from OpenTelemetry signals.
@@ -47,8 +47,10 @@ Or by accessing the API Swagger at http://askneron.localhost/docs.
 To improve the answer of the RAG model, you can index new documents in the vector database by putting them in the `data` directory and running the following command:
 
 ```bash
-make index-documents
+make index-local-documents
 ```
+
+`make index-documents` scrapes the wikis again and indexes them in production through an SSH tunnel. Documents go to a new index, which is served once complete: the previous index is kept for rollback.
 
 ## Development
 

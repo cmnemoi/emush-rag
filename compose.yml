@@ -41,13 +41,19 @@ services:
       - host.docker.internal:host-gateway
 
   vector_store:
-    image: chromadb/chroma:1.5.9
+    image: opensearchproject/opensearch:3.8.0
+    environment:
+      - discovery.type=single-node
+      # Only reachable from the Compose network and the host: no need for TLS and users.
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
     - mode: ingress
-      target: 8000
+      target: 9200
       protocol: tcp
     volumes:
-    - ./chroma:/data
+    - opensearch-data:/usr/share/opensearch/data
     restart: always
     networks:
       - emush_rag
@@ -86,3 +92,4 @@ networks:
 
 volumes:
   grafana-data:
+  opensearch-data:

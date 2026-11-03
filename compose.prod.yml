@@ -7,8 +7,8 @@ services:
     expose: ["8080"]
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
-      - VECTOR_STORE_URL=${VECTOR_STORE_URL}
-      - VECTOR_STORE_PORT=${VECTOR_STORE_PORT}
+      - VECTOR_STORE_URL=vector_store
+      - VECTOR_STORE_PORT=9200
     depends_on:
       - vector_store
       - jaeger
@@ -19,11 +19,24 @@ services:
     restart: unless-stopped
 
   vector_store:
-    image: chromadb/chroma:1.5.9
-    # The image runs as root by default: ./chroma must belong to this user.
-    user: "10001:10001"
+    image: opensearchproject/opensearch:3.8.0
+    container_name: emush-rag-vector-store
+    environment:
+      - discovery.type=single-node
+      # Only reachable from the Compose network and the server loopback: no need for TLS and users.
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+    # Published on the server loopback only, for `make index-documents` to reach it through an SSH tunnel.
+    ports:
+      - "127.0.0.1::9200"
+    mem_limit: 2g
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     volumes:
-      - ./chroma:/data
+      - opensearch-data:/usr/share/opensearch/data
     restart: unless-stopped
     networks:
       - emush_rag
@@ -55,3 +68,4 @@ networks:
     driver: bridge
 volumes:
   grafana-data:
+  opensearch-data:

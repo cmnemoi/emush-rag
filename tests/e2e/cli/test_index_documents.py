@@ -3,20 +3,25 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from chromadb import PersistentClient
+import pytest
 from click.testing import Result
+from opensearchpy import OpenSearch
+from testcontainers.community.opensearch import OpenSearchContainer
 from typer.testing import CliRunner
 
-from emush_rag.adapters.chroma_vector_store import ChromaVectorStore
-from emush_rag.cli.index_documents import app
+from emush_rag.adapters.opensearch_vector_store import OpenSearchVectorStore
+from emush_rag.cli.index_documents import create_app
+from tests.test_doubles import FakeEmbedder
 
 
 class TestIndexDocumentsCLI:
-    def setup_method(self) -> None:
+    @pytest.fixture(autouse=True)
+    def setup(self, opensearch_container: OpenSearchContainer, opensearch_client: OpenSearch) -> None:
+        self.opensearch_container = opensearch_container
+        self.opensearch_client = opensearch_client
         self.sample_documents = self._create_sample_documents()
         self.temp_dir = self._create_temp_dir()
         self.data_dir = self._create_data_dir()
-        self.chroma_persist_dir = self._create_chroma_persist_dir()
         self._write_sample_documents_to_file()
 
     def teardown_method(self) -> None:
@@ -27,32 +32,29 @@ class TestIndexDocumentsCLI:
         runner = self._create_cli_runner()
 
         # When indexing documents using the CLI
-        result = self._run_index_documents_command(runner, collection_name="my_collection")
+        result = self._run_index_documents_command(runner, index_alias="my_alias")
 
         # Then the command should succeed
         self._assert_command_succeeded(result)
 
-        # And documents should be stored in Chroma
-        indexed_documents = self._get_indexed_documents(collection_name="my_collection")
+        # And documents should be served under the alias
+        indexed_documents = self._get_indexed_documents(index_alias="my_alias")
         self._assert_documents_were_indexed_correctly(indexed_documents)
 
-    def test_should_use_custom_collection_name_when_provided(self) -> None:
-        # Given a CLI runner and a custom collection name
+    def test_reindexing_replaces_the_documents_served_under_the_alias(self) -> None:
+        # Given documents already indexed
         runner = self._create_cli_runner()
-        custom_collection_name = "my_custom_collection"
+        self._run_index_documents_command(runner, index_alias="my_alias")
 
-        # When indexing documents using the CLI with a custom collection name
-        result = self._run_index_documents_command(runner, collection_name=custom_collection_name)
+        # When indexing again after one document was removed
+        self.sample_documents = self.sample_documents[:1]
+        self._write_sample_documents_to_file()
+        result = self._run_index_documents_command(runner, index_alias="my_alias")
 
-        # Then the command should succeed
-        self._assert_command_succeeded(result)
-
-        # And documents should be stored in Chroma with the custom collection name
-        vector_store = ChromaVectorStore(
-            client=PersistentClient(path=self.temp_dir),
-            collection_name=custom_collection_name,
-        )
-        assert vector_store.collection.name == custom_collection_name
+        # Then only the remaining document should be served
+        self._assert_command_succeeded(result, nb_documents=1)
+        indexed_documents = self._get_indexed_documents(index_alias="my_alias")
+        self._assert_documents_were_indexed_correctly(indexed_documents)
 
     def _create_sample_documents(self) -> list[dict]:
         return [
@@ -78,11 +80,6 @@ class TestIndexDocumentsCLI:
         data_dir.mkdir()
         return data_dir
 
-    def _create_chroma_persist_dir(self) -> Path:
-        chroma_persist_dir = Path(self.temp_dir) / "chroma"
-        chroma_persist_dir.mkdir()
-        return chroma_persist_dir
-
     def _write_sample_documents_to_file(self) -> None:
         with open(self.data_dir / "documents.json", "w") as f:
             json.dump(self.sample_documents, f)
@@ -93,21 +90,26 @@ class TestIndexDocumentsCLI:
     def _create_cli_runner(self) -> CliRunner:
         return CliRunner()
 
-    def _run_index_documents_command(self, runner: CliRunner, collection_name: str) -> Result:
-        args = ["--data-dir", str(self.data_dir), "--chroma-persist-dir", str(self.chroma_persist_dir)]
-        if collection_name:
-            args.extend(["--collection-name", collection_name])
-        return runner.invoke(app, args)
+    def _run_index_documents_command(self, runner: CliRunner, index_alias: str) -> Result:
+        opensearch = self.opensearch_container.get_config()
+        args = [
+            "--data-dir",
+            str(self.data_dir),
+            "--vector-store-url",
+            opensearch["host"],
+            "--vector-store-port",
+            str(opensearch["port"]),
+            "--index-alias",
+            index_alias,
+        ]
+        return runner.invoke(create_app(embedder=FakeEmbedder()), args)
 
-    def _assert_command_succeeded(self, result: Result) -> None:
-        assert result.exit_code == 0
-        assert "2 documents indexed successfully!" in result.stdout
+    def _assert_command_succeeded(self, result: Result, nb_documents: int = 2) -> None:
+        assert result.exit_code == 0, result.output
+        assert f"{nb_documents} documents indexed successfully" in result.stdout
 
-    def _get_indexed_documents(self, collection_name: str) -> list:
-        vector_store = ChromaVectorStore(
-            client=PersistentClient(path=str(self.chroma_persist_dir)),
-            collection_name=collection_name,
-        )
+    def _get_indexed_documents(self, index_alias: str) -> list:
+        vector_store = OpenSearchVectorStore(client=self.opensearch_client, alias=index_alias, embedder=FakeEmbedder())
         return vector_store.get_all_documents()
 
     def _assert_documents_were_indexed_correctly(self, indexed_documents: list) -> None:
