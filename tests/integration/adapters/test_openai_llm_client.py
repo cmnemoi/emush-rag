@@ -3,15 +3,19 @@ import os
 import pytest
 
 from emush_rag.adapters.openai_llm_client import OpenAILLMClient
+from emush_rag.config import Config
 from emush_rag.ports.llm_client import ChatMessage
 
 
 class TestOpenAILLMClient:
     @pytest.fixture(autouse=True)
     def setup(self) -> None:
-        if not os.getenv("OPENAI_API_KEY"):
-            pytest.skip("OPENAI_API_KEY not set")
-        self.client = OpenAILLMClient(model="gpt-4o-mini")
+        if not os.getenv("OPENROUTER_API_KEY"):
+            pytest.skip("OPENROUTER_API_KEY not set")
+        config = Config()
+        self.client = OpenAILLMClient(
+            model=config.evaluation_model, api_key=config.openrouter_api_key, base_url=config.llm_api_base_url
+        )
 
     def test_complete_returns_valid_response_with_system_prompt_and_user_message(self) -> None:
         system_prompt = "You are a helpful assistant. Answer questions concisely."

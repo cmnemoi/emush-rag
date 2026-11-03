@@ -26,7 +26,9 @@ def rate_limiter(datetime_provider: type[datetime] = datetime) -> RateLimiter:  
 
 
 def _llm_client() -> OpenAILLMClient:
-    return OpenAILLMClient(model=config.chat_model)
+    return OpenAILLMClient(
+        model=config.chat_model, api_key=config.openrouter_api_key, base_url=config.llm_api_base_url
+    )
 
 
 def _vector_store(embedding_function: OpenAIEmbeddingFunction) -> ChromaVectorStore:
@@ -41,4 +43,6 @@ def _vector_store(embedding_function: OpenAIEmbeddingFunction) -> ChromaVectorSt
 
 
 def _embedding_function() -> OpenAIEmbeddingFunction:
-    return OpenAIEmbeddingFunction(api_key=config.openai_api_key, model_name=config.embedding_model)
+    return OpenAIEmbeddingFunction(
+        api_key=config.openrouter_api_key, model_name=config.embedding_model, api_base=config.llm_api_base_url
+    )

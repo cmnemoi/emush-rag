@@ -25,7 +25,7 @@ Stack:
 ## Installation
 
 - Run the following command: `curl -sSL https://raw.githubusercontent.com/cmnemoi/emush_rag/main/clone-and-install | bash`
-- Add an [OpenAI API key](https://platform.openai.com/api-keys) to the `.env` file.
+- Add an [OpenRouter API key](https://openrouter.ai/settings/keys) to the `.env` file.
 
 ## Usage
 

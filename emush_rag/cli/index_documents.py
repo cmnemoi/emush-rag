@@ -29,7 +29,9 @@ def main(
     vector_store = ChromaVectorStore(
         client=PersistentClient(path=chroma_persist_dir),
         collection_name=collection_name,
-        embedding_function=OpenAIEmbeddingFunction(api_key=config.openai_api_key, model_name=config.embedding_model),
+        embedding_function=OpenAIEmbeddingFunction(
+            api_key=config.openrouter_api_key, model_name=config.embedding_model, api_base=config.llm_api_base_url
+        ),
     )
     index_documents_usecase = IndexDocuments(
         document_reader=document_reader,

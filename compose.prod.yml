@@ -6,7 +6,7 @@ services:
     container_name: emush-rag-api
     expose: ["8080"]
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - VECTOR_STORE_URL=${VECTOR_STORE_URL}
       - VECTOR_STORE_PORT=${VECTOR_STORE_PORT}
     depends_on:

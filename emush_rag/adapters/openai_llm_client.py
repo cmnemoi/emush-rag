@@ -4,8 +4,8 @@ from emush_rag.ports.llm_client import ChatMessage, LLMClient
 
 
 class OpenAILLMClient(LLMClient):
-    def __init__(self, model: str):
-        self.client = OpenAI()
+    def __init__(self, model: str, api_key: str | None, base_url: str):
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
         self.model = model
 
     def complete(self, system_prompt: str, messages: list[ChatMessage]) -> str:
