@@ -91,6 +91,15 @@ class TestIndexDocuments:
             assert chunk.metadata["link"] == "https://example.com"
             assert chunk.metadata["source"] == "test_source"
 
+    def test_should_not_index_documents_without_content(self):
+        document = self._create_document_with_metadata(content="some content")
+        empty_document = self._create_document_with_metadata(content="", title_suffix="-empty")
+        self.document_reader.set_json_entries([document, empty_document])
+
+        self.index_documents.execute()
+
+        self._assert_documents_indexed([document])
+
     def test_reindexing_serves_only_the_new_documents(self):
         self._create_documents_with_content(2, content="old content")
         self.index_documents.execute()

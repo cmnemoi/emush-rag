@@ -1,5 +1,5 @@
 #!/bin/sh
-# Index data/ into the production OpenSearch through an SSH tunnel.
+# Scrape the wikis and index them into the production OpenSearch through an SSH tunnel.
 # The API keeps serving the previous index until the new one is complete.
 #
 # Usage: scripts/index-production-documents [ssh options...] <destination>
@@ -16,8 +16,13 @@ fi
 SERVER_PORT=8162
 LOCAL_PORT=19200
 CONTROL_SOCKET="$(mktemp -u)"
+# Scraped outside of data/, which only holds an extract of the wikis for local development.
+SCRAPED_DIR="$(mktemp -d)"
+
+uv run --group indexation mush-wikis-scrap > "$SCRAPED_DIR/wikis.json"
 
 ssh -M -S "$CONTROL_SOCKET" -fN -o ExitOnForwardFailure=yes -L "$LOCAL_PORT:127.0.0.1:$SERVER_PORT" "$@"
-trap 'ssh -S "$CONTROL_SOCKET" -O exit "$@" 2>/dev/null' EXIT
+trap 'ssh -S "$CONTROL_SOCKET" -O exit "$@" 2>/dev/null; rm -rf "$SCRAPED_DIR"' EXIT
 
-uv run emush_rag/cli/index_documents.py --vector-store-url localhost --vector-store-port "$LOCAL_PORT"
+uv run emush_rag/cli/index_documents.py \
+    --data-dir "$SCRAPED_DIR" --vector-store-url localhost --vector-store-port "$LOCAL_PORT"

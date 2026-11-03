@@ -18,6 +18,7 @@ class FileSystemJsonDocumentReader(DocumentReader):
         for file_path in Path(self.data_directory).glob("*.json"):
             with open(file_path, "r") as f:
                 file_entries = json.load(f)
-                json_entries.extend([Document.from_dict(entry) for entry in file_entries])
+                # The scraper writes a null content for the pages it could not parse.
+                json_entries.extend([Document.from_dict(entry) for entry in file_entries if entry["content"]])
 
         return json_entries

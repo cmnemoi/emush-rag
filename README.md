@@ -44,13 +44,13 @@ Or by accessing the API Swagger at http://askneron.localhost/docs.
 
 ## Indexing new documents
 
-To improve the answer of the RAG model, you can index new documents in the vector database by putting them in the `data` directory and running the following command:
+`data` holds an extract of the wikis, small enough for git. To index it in your local vector database, run:
 
 ```bash
 make index-local-documents
 ```
 
-Production is reindexed from freshly scraped wikis every Monday by the [Index documents](.github/workflows/index_documents.yaml) workflow, which can also be run manually from GitHub. To reindex it from your machine, run `make index-documents`: it needs a `cmnemoi.production` host in your SSH config.
+Production is reindexed from the whole, freshly scraped wikis every Monday by the [Index documents](.github/workflows/index_documents.yaml) workflow, which can also be run manually from GitHub. To reindex it from your machine, run `make index-documents`: it needs a `cmnemoi.production` host in your SSH config.
 
 Both reach the production OpenSearch through an SSH tunnel. Documents go to a new index, which is served once complete: the previous index is kept for rollback.
 

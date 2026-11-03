@@ -1,3 +1,6 @@
+import json
+from pathlib import Path
+
 from emush_rag.adapters.file_system_json_document_reader import FileSystemJsonDocumentReader
 from emush_rag.models.document import Document
 
@@ -18,6 +21,17 @@ class TestFileSystemJsonDocumentReader:
         json_entries = self._when_reading_json_entries()
 
         self._then_all_entries_should_have_required_fields(json_entries)
+
+    def test_should_skip_entries_without_content(self, tmp_path: Path):
+        entries = [
+            {"title": "Spores", "link": "https://example.com/spores", "source": "wiki", "content": "Spores content"},
+            {"title": "Pilgred", "link": "https://example.com/pilgred", "source": "wiki", "content": None},
+        ]
+        (tmp_path / "wikis.json").write_text(json.dumps(entries))
+
+        json_entries = FileSystemJsonDocumentReader(data_directory=str(tmp_path)).read_documents()
+
+        assert [entry.metadata["title"] for entry in json_entries] == ["Spores"]
 
     def _when_reading_json_entries(self) -> list[Document]:
         return self.reader.read_documents()

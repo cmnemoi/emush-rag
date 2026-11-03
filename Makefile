@@ -15,7 +15,6 @@ check-types:
 	uv run mypy .
 
 index-documents:
-	uv run --group indexation mush-wikis-scrap > data/wikis.json
 	./scripts/index-production-documents cmnemoi.production
 
 index-local-documents:
