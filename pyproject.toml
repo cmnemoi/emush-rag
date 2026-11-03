@@ -62,6 +62,10 @@ testpaths = ["tests/"]
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
+# uv.lock records the project version: lock again so that the release commit passes `uv sync --locked`.
+# The GitHub Action runs in a container without uv.
+build_command = "command -v uv >/dev/null || python -m pip install --quiet uv==0.13.4; uv lock"
+assets = ["uv.lock"]
 
 [build-system]
 requires = ["hatchling"]
