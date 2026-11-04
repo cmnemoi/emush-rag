@@ -9,7 +9,7 @@ A RAG-based API to answer questions about [eMush](https://emush.eternaltwin.org/
 Stack: 
 - [FastAPI](https://fastapi.tiangolo.com/) for the API, [pytest](https://docs.pytest.org/en/stable/) for automated testing ;
 - [OpenSearch](https://opensearch.org/) for the hybrid search (keywords and embeddings) allowing document retrieval ;
-- [Github Actions](https://github.com/features/actions) and [Docker Swarm](https://docs.docker.com/engine/swarm/) for automated deployment via a CI/CD pipeline on a self-managed [Digital Ocean server](https://www.digitalocean.com/products/droplets/) : https://askneron.com/docs
+- [Github Actions](https://github.com/features/actions) and [Docker Compose](https://docs.docker.com/compose/) for automated deployment via a CI/CD pipeline on a self-managed [OVH VPS](https://www.ovhcloud.com/en/vps/) : https://api.askneron.cmnemoi.com/docs
 - [OpenTelemetry](https://opentelemetry.io/) for tracing and metrics (exported with [Jaeger](https://www.jaegertracing.io/)) ;
 - [Grafana](https://grafana.com/) for monitoring dashboards from OpenTelemetry signals.
 
