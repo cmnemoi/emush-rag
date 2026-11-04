@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
 
   vector_store:
-    image: opensearchproject/opensearch:3.8.0
+    image: opensearchproject/opensearch:3.9.0
     container_name: emush-rag-vector-store
     environment:
       - discovery.type=single-node
