@@ -1,6 +1,6 @@
 services:
   reverse-proxy:
-    image: traefik:v3.7.15
+    image: traefik:v3.7.16
     command:
       - "--api.insecure=true"
       - "--providers.docker=true"
@@ -41,7 +41,7 @@ services:
       - host.docker.internal:host-gateway
 
   vector_store:
-    image: opensearchproject/opensearch:3.8.0
+    image: opensearchproject/opensearch:3.9.0
     environment:
       - discovery.type=single-node
       # Only reachable from the Compose network and the host: no need for TLS and users.
