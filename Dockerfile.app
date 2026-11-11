@@ -1,5 +1,5 @@
 # Step 1: Build the application
-FROM python:3.13-slim AS builder
+FROM python:3.15-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:0.8.2 /uv /uvx /bin/
 
 # Change the working directory to the `app` directory
@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-editable
 
 # Step 2: Run the application
-FROM python:3.13-slim
+FROM python:3.15-slim
 
 # The application runs unprivileged and cannot modify its own code, owned by root.
 RUN useradd --system --uid 10001 --create-home app
