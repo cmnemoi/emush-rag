@@ -51,14 +51,15 @@ def create_app(embedder: Embedder) -> typer.Typer:
     return app
 
 
-app = create_app(
-    embedder=OpenAIEmbedder(
+def app() -> None:
+    embedder = OpenAIEmbedder(
         model=config.embedding_model,
         dimension=config.embedding_dimension,
         api_key=config.openrouter_api_key,
         base_url=config.llm_api_base_url,
     )
-)
+    create_app(embedder=embedder)()
+
 
 if __name__ == "__main__":
     app()

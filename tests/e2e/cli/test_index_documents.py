@@ -1,5 +1,8 @@
 import json
+import os
 import shutil
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -11,6 +14,22 @@ from emush_rag.adapters.opensearch_vector_store import OpenSearchVectorStore
 from emush_rag.cli.index_documents import create_app
 from tests.conftest import OpenSearchAddress
 from tests.test_doubles import FakeEmbedder
+
+
+def test_should_import_cli_without_openrouter_api_key() -> None:
+    # Given no OpenRouter API key, like in CI runs without secrets
+    environment = {**os.environ, "OPENROUTER_API_KEY": "", "OPENAI_API_KEY": ""}
+
+    # When importing the CLI module
+    result = subprocess.run(
+        [sys.executable, "-c", "import emush_rag.cli.index_documents"],
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+
+    # Then the import should succeed
+    assert result.returncode == 0, result.stderr
 
 
 class TestIndexDocumentsCLI:
