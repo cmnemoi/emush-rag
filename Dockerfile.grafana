@@ -1,5 +1,10 @@
 FROM grafana/grafana-oss:13.0.2
 
+# The base image often lags behind Alpine's security fixes.
+USER root
+RUN apk upgrade --no-cache
+USER 472
+
 COPY ./grafana/provisioning /etc/grafana/provisioning
 
 EXPOSE 3000
