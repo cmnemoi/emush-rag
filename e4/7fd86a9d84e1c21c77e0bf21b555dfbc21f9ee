@@ -1,0 +1,23 @@
+tests/e2e/cli/test_index_documents.py
+  s_c05c167437e89d::t_204a1c41944469 2,4-5,19-32
+  s_c05c167437e89d::t_cc1a1196f64623 33-34
+emush_rag/cli/index_documents.py
+  s_c05c167437e89d::t_dea3ed31da1ec9 54-55,61
+  s_c05c167437e89d::t_73973790092067 62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e47fd86a9d84e1c21c77e0bf21b555dfbc21f9ee",
+  "prompts": {},
+  "sessions": {
+    "s_c05c167437e89d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db9f5772-f0be-4fd7-ac82-c936898288a5",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Charles-Meldhine Madi Mnemoi <icdk5b4zf@relay.firefox.com>"
+    }
+  }
+}
